@@ -1,3 +1,4 @@
+require("dotenv").config();
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const express = require("express");
@@ -16,6 +17,51 @@ app.use(bodyParser.json());
 app.use(express.static("public"));
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/index.html");
+});
+
+// User model
+const userSchema = mongoose.Schema({
+  _id: {
+    type: String,
+    default: shortid.generate
+  },
+  username: {
+    type: String,
+    unique: true
+  }
+});
+
+const User = mongoose.model("User", userSchema);
+
+app.post("/api/exercise/new-user", (req, res) => {
+  const newUser = new User(req.body);
+  newUser.save((error, savedUser) => {
+    if (error) {
+      console.error(error);
+      if (error.code === 11000) {
+        // trying to create duplicate user
+        res.status(403).send(`User ${newUser.username} already exists`);
+      } else {
+        res.sendStatus(500);
+      }
+    } else {
+      const pickFields = ({ _id, username }) => ({ _id, username });
+      res.json(pickFields(savedUser));
+    }
+  });
+});
+
+app.get("/api/exercise/users", (req, res) => {
+  User.find()
+    .select({ _id: 1, username: 1 })
+    .exec((error, result) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send(error.message);
+      } else {
+        res.json(result);
+      }
+    });
 });
 
 // Not found middleware
