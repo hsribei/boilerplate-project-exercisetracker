@@ -5,14 +5,15 @@
   "author": "Helder S Ribeiro",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "nodemon inspect server.js"
   },
   "dependencies": {
-    "express": "^4.14.0",
-    "mongoose": "^5.0.9",
-    "mongodb": "^3.0.4",
     "body-parser": "^1.15.2",
-    "cors": "^2.8.1"
+    "cors": "^2.8.1",
+    "dotenv": "^5.0.1",
+    "express": "^4.14.0",
+    "mongodb": "^3.0.4",
+    "mongoose": "^5.0.9"
   },
   "engines": {
     "node": "^9.3.0"
@@ -21,8 +22,8 @@
     "url": "https://github.com/hsribei/boilerplate-project-exercisetracker"
   },
   "license": "MIT",
-  "keywords": [
-    "node",
-    "express"
-  ]
+  "keywords": ["node", "express"],
+  "devDependencies": {
+    "nodemon": "^1.17.1"
+  }
 }
