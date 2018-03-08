@@ -1,10 +1,11 @@
-const express = require("express");
-const app = express();
 const bodyParser = require("body-parser");
-
 const cors = require("cors");
-
+const express = require("express");
 const mongoose = require("mongoose");
+const shortid = require("shortid");
+
+const app = express();
+
 mongoose.connect(process.env.MONGO_URI || "mongodb://localhost/exercise-track");
 
 app.use(cors());
