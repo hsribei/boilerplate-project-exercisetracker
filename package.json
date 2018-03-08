@@ -5,7 +5,8 @@
   "author": "Helder S Ribeiro",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon --inspect server.js"
+    "start": "node server.js",
+    "develop": "nodemon --inspect server.js"
   },
   "dependencies": {
     "body-parser": "^1.15.2",
@@ -23,10 +24,7 @@
     "url": "https://github.com/hsribei/boilerplate-project-exercisetracker"
   },
   "license": "MIT",
-  "keywords": [
-    "node",
-    "express"
-  ],
+  "keywords": ["node", "express"],
   "devDependencies": {
     "nodemon": "^1.17.1"
   }
