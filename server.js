@@ -19,6 +19,20 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/index.html");
 });
 
+// Exercise model
+const exerciseSchema = mongoose.Schema({
+  description: {
+    type: String,
+    required: true
+  },
+  duration: {
+    // duration is in minutes
+    type: Number,
+    required: true
+  },
+  date: Date
+});
+
 // User model
 const userSchema = mongoose.Schema({
   _id: {
@@ -29,7 +43,8 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true,
     unique: true
-  }
+  },
+  exercises: [exerciseSchema]
 });
 
 const User = mongoose.model("User", userSchema);
@@ -63,6 +78,25 @@ app.get("/api/exercise/users", (req, res) => {
         res.json(result);
       }
     });
+});
+
+app.post("/api/exercise/add", (req, res) => {
+  User.findOne({ _id: req.body.userId }, (error, user) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send(error.message);
+    } else {
+      user.exercises.push(req.body);
+      user.save((err, savedUser) => {
+        if (error) {
+          console.error(err);
+          res.status(500).send(error.message);
+        } else {
+          res.json(savedUser);
+        }
+      });
+    }
+  });
 });
 
 // Not found middleware
