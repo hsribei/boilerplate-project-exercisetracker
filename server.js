@@ -111,6 +111,51 @@ app.post("/api/exercise/add", (req, res) => {
   });
 });
 
+app.get("/api/exercise/log", (req, res) => {
+  const { userId, from, to, limit } = req.query;
+  User.findOne({ _id: userId }, (error, user) => {
+    if (error) {
+      console.error(error);
+      res.sendStatus(500);
+    } else if (!user) {
+      res.status(404).send(`User with id ${userId} not found`);
+    } else {
+      let log = user.log;
+
+      if (from || to) {
+        log.sort((a, b) => a.date - b.date);
+
+        function findFromIdx(from) {
+          const fromDate = new Date(from);
+          const fromIdx = log.findIndex(exercise => exercise.date >= fromDate);
+          return fromIdx >= 0 ? fromIdx : log.length;
+        }
+        const fromIdx = from ? findFromIdx(from) : 0;
+
+        function findToIdx(to) {
+          const reverseToIdx = [...log]
+            .reverse() // findIndex finds the first, we want the last
+            .findIndex(exercise => exercise.date < new Date(to));
+          return reverseToIdx >= 0 ? log.length - reverseToIdx : 0;
+        }
+        const toIdx = to ? findToIdx(to) : log.length;
+
+        // the interval is [from, to)
+        log = log.slice(fromIdx, toIdx);
+      }
+
+      const limitNumber = Number(limit);
+      if (limitNumber) {
+        log = log.slice(0, limitNumber);
+      }
+      const result = JSON.parse(JSON.stringify(user));
+      result.log = log;
+      result.count = log.length;
+      res.json(result);
+    }
+  });
+});
+
 // Not found middleware
 app.use((req, res, next) => {
   return next({ status: 404, message: "not found" });
