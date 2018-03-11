@@ -30,7 +30,10 @@ const exerciseSchema = mongoose.Schema({
     type: Number,
     required: true
   },
-  date: Date
+  date: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 // User model
@@ -44,7 +47,7 @@ const userSchema = mongoose.Schema({
     required: true,
     unique: true
   },
-  exercises: [exerciseSchema]
+  log: [exerciseSchema]
 });
 
 const User = mongoose.model("User", userSchema);
@@ -81,12 +84,21 @@ app.get("/api/exercise/users", (req, res) => {
 });
 
 app.post("/api/exercise/add", (req, res) => {
-  User.findOne({ _id: req.body.userId }, (error, user) => {
+  const newExercise = JSON.parse(JSON.stringify(req.body));
+  User.findOne({ _id: newExercise.userId }, (error, user) => {
     if (error) {
       console.error(error);
       res.status(500).send(error.message);
     } else {
-      user.exercises.push(req.body);
+      if (
+        newExercise.hasOwnProperty("date") &&
+        newExercise.date.trim() === ""
+      ) {
+        // if we don't do this, the default Date.now in the schema definition
+        // doesn't get called and exercise.date becomes null
+        delete newExercise.date;
+      }
+      user.log.push(newExercise);
       user.save((err, savedUser) => {
         if (error) {
           console.error(err);
